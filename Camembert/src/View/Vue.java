@@ -8,7 +8,6 @@ import Model.Item;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
@@ -16,7 +15,7 @@ import java.util.List;
 
 import javax.swing.*;
 
-public class Vue extends JComponent implements MouseListener, Observer {
+public class Vue extends JComponent implements MouseListener{
 
 
     private  Rectangle2D.Double b1 =null;
@@ -32,7 +31,6 @@ public class Vue extends JComponent implements MouseListener, Observer {
 
     public String mTexte = "";
     public double valeur;
-    public String amount = "";
     public String titre  = "";
 
     public boolean isClick;
@@ -56,18 +54,6 @@ public class Vue extends JComponent implements MouseListener, Observer {
     int wl = 12;
     int hl = 12;
 
-    /**
-    int rx1 = 150;
-    int rx2 = 290;
-    int ry = 400;
-    int rw = 20;
-    int rh = 20;
-    int ryRot = 450;**/
-
-
-    public Vue() {
-
-    }
 
     public Vue(IModel im, IControlleur ic) {
         mTexte = "Selectionnez une portion ! ";
@@ -101,24 +87,25 @@ public class Vue extends JComponent implements MouseListener, Observer {
 
 
         // Dessin du cadre description
-        g2d.setPaint(Color.BLACK);
-        g2d.draw(new Rectangle2D.Double(xd, yd, wd+50, hd));
+        g2d.setPaint(Color.WHITE);
+        System.out.println("COULEUR!");
+        g2d.fill(new Rectangle2D.Double(xd-70, yd, wd+50, hd));
         g2d.setPaint(Color.BLACK);
 
         //DESCRIPTION DU QUARTIER
-        g2d.drawString("Informations", xd, yd - 5);
-        g2d.drawString(titre, xd+3, yd+20);
-        g2d.drawString(mTexte, xd+3, yd+57);
-        g2d.drawString("Prix: "+String.valueOf(valeur)+" euros", xd+3, yd+100);
+        g2d.drawString("Informations", xd-70, yd - 5);
+        g2d.drawString(titre, xd-65, yd+20);
+        g2d.drawString(mTexte, xd-65, yd+57);
+        g2d.drawString("Prix: "+String.valueOf(valeur)+" euros", xd-65, yd+100);
 
 
 
 
-        List<Item> items = model.getItem();
+        List<Item> items = model.getItems();
         double total = 0;
         int i=0;
          for (Shape shape: shapes){
-             g2d.setColor(listColor.get(i));
+             g2d.setColor(listColor.get(i%50));
              i++;
              g2d.fill(shape);
          }
@@ -142,32 +129,37 @@ public class Vue extends JComponent implements MouseListener, Observer {
 
         initCamembert();
 
+        boolean click=false;
         int clickX = c.getX();
         int clickY = c.getY();
 
-        valeur = 0.0;
-        mTexte = "Desciption:";
-        titre  = "Titre:";
 
         for (int j=0;j < shapes.length; j++){
             if(shapes[j].contains(clickX, clickY)){
+                click=true;
                 indice = j;
                 controller.inClick(shapes[j], indice);
             }
         }
-
         if(this.b1.contains(clickX,clickY)){
+
+            click=true;
             indice = (indice-1+shapes.length)%shapes.length;
             controller.inClick(shapes[indice], indice);
 
         }
+        else if(this.b2.contains(clickX,clickY)){
 
-        if(this.b2.contains(clickX,clickY)){
-
+            click=true;
             indice = (indice+1)%shapes.length;
             controller.inClick(shapes[indice], indice);
         }
+        if(!click){
 
+            valeur = 0;
+            mTexte ="Selectionnez une portion !";
+            titre  ="";
+        }
         repaint();
 
     }
@@ -186,8 +178,7 @@ public class Vue extends JComponent implements MouseListener, Observer {
 
     @Override
     public void mousePressed(MouseEvent arg0) {
-       //System.out.println(arg0.getX() );
-      // System.out.println(arg0.getY());
+
 
     }
 
@@ -201,13 +192,13 @@ public class Vue extends JComponent implements MouseListener, Observer {
         Arc2D.Float arc = new Arc2D.Float(Arc2D.PIE);
         arc.setFrame(100, 150, 200, 200);
         double total = 0;
-        for (Item it : this.model.getItem()) {
+        for (Item it : this.model.getItems()) {
             total += it.getValeur();
         }
         double currentValue = 0;
         int angleDepart = 0;
         int i = 0;
-        for (Item it : this.model.getItem()) {
+        for (Item it : this.model.getItems()) {
             angleDepart = (int) (currentValue * 360 / total);
             int arcAngle = (int) (it.getValeur() * 360 / total);
             shapes[i] = new Arc2D.Double(100, 150, 200, 200, angleDepart, arcAngle, Arc2D.PIE);
@@ -219,55 +210,20 @@ public class Vue extends JComponent implements MouseListener, Observer {
     }
 
     public void init() { /** * Initialisation */
-        shapes = new Shape[this.model.getItem().size()];
-        color = new Color[this.model.getItem().size()];
-        for (int i = 0; i < this.model.getItem().size(); i++) {
-            color[i] = listColor.get(i);
+        shapes = new Shape[this.model.getItems().size()];
+        color = new Color[this.model.getItems().size()];
+        for (int i = 0; i < this.model.getItems().size(); i++) {
+            color[i%50] = listColor.get(i%50);
         }
     }
 
     public void initColor(){
-        Color c1 = new Color(173, 255, 47);
-        Color c2 = new Color(0, 127, 213);
-        Color c3 = new Color(127, 0, 213);
-        Color c4 = new Color(66, 124, 1);
-        Color c5 = new Color(42, 42, 42);
-        Color c6 = new Color(255, 247, 200);
 
+        Random rand = new Random();
+        for(int i=0; i<50;i++){
+            listColor.add(new Color(rand.nextFloat(),rand.nextFloat(),rand.nextFloat()));
 
-        listColor.add(c1);listColor.add(c2);
-        listColor.add(c3);listColor.add(c4);
-        listColor.add(c5);listColor.add(c6);
+        }
     }
 
-
-    @Override
-    public void update(Observable observable, Object o) {
-        repaint();
-    }
 }
-
-/**arc = (Arc2D) shapes[j];
- shapes[j] = new Arc2D.Double(50, 100, 300, 300, arc.getAngleStart(), arc.getAngleExtent(), Arc2D.PIE);
- **/
-/**valeur = model.getItem(indice).getValeur();
- mTexte ="Description: " + model.getItem(indice).getDescription();
- titre  ="Titre: "+  model.getItem(indice).getTitre();**/
-
-
-/**
- Arc2D newArc = (Arc2D) shapes[indice];
- shapes[indice] = new Arc2D.Double(50, 100, 300, 300, newArc.getAngleStart(), newArc.getAngleExtent(), Arc2D.PIE);
- **/
-/**valeur = model.getItem(indice).getValeur();
- mTexte ="Description: " + model.getItem(indice).getDescription();
- titre  ="Titre: "+  model.getItem(indice).getTitre();**/
-
-/**
- Arc2D newArc = (Arc2D) shapes[indice];
- shapes[indice] = new Arc2D.Double(50, 100, 300, 300, newArc.getAngleStart(), newArc.getAngleExtent(), Arc2D.PIE);
-
-
- valeur = model.getItem(indice).getValeur();
- mTexte ="Description: " + model.getItem(indice).getDescription();
- titre  ="Titre: "+  model.getItem(indice).getTitre();**/

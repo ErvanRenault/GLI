@@ -9,11 +9,11 @@ import java.util.List;
 public interface IModel {
 
 
-    public Item getItem(int i);
+    public Item getItems(int i);
     public void addItem(Item i);
     public String getTitre(Item i);
     public void removeItem(Item i);
-    public List<Item> getItem();
+    public List<Item> getItems();
 
 
 

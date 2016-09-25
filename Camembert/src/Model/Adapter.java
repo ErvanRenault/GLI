@@ -1,9 +1,5 @@
 package Model;
 
-import Controlleur.Controlleur;
-import View.Vue;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,8 +16,8 @@ public class Adapter implements IModel {
     }
 
 
-    public Item getItem(int i){
-        return model.getItem(i);
+    public Item getItems(int i){
+        return model.getItems(i);
     }
 
     public void addItem(Item i){
@@ -37,5 +33,5 @@ public class Adapter implements IModel {
         model.removeItem(i);
     }
 
-    public List<Item> getItem(){return model.getItem();}
+    public List<Item> getItems(){return model.getItems();}
 }

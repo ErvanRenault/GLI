@@ -26,7 +26,9 @@ public class Controlleur implements IControlleur {
     }
 
     @Override
-    public void removeItem() {
+    public void removeItem(int i) {
+
+        vue.model.getItems().remove(i); update();
 
     }
 
@@ -36,13 +38,24 @@ public class Controlleur implements IControlleur {
         Arc2D arc = (Arc2D) shape;
         vue.shapes[indice] = new Arc2D.Double(50, 100, 300, 300, arc.getAngleStart(), arc.getAngleExtent(), Arc2D.PIE);
 
-        vue.valeur = vue.model.getItem(indice).getValeur();
-        vue.mTexte ="Description: " + vue.model.getItem(indice).getDescription();
-        vue.titre  ="Titre: "+  vue.model.getItem(indice).getTitre();
+        vue.valeur = vue.model.getItems(indice).getValeur();
+        vue.mTexte ="Description: " + vue.model.getItems(indice).getDescription();
+        vue.titre  ="Titre: "+  vue.model.getItems(indice).getTitre();
 
     }
 
+     public void update(){
 
+
+         vue.init();
+         vue.initCamembert();
+         vue.valeur = 0;
+         vue.mTexte ="Selectionnez une portion !";
+         vue.titre  ="";
+         vue.repaint();
+
+
+     }
      public void setVue(Vue vue){
          this.vue = vue;
      }

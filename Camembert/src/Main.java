@@ -8,11 +8,8 @@ import Model.Item;
 import Model.TableCamembert;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
+import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,9 +17,7 @@ import java.util.List;
 public class Main {
 
     private static String titreAppli = "Camembert Interactif Application";
-
     public static void main(String[] args) {
-
 
         List<Item> list = new ArrayList<Item>();
 
@@ -36,41 +31,56 @@ public class Main {
         list.add(i4);
 
         Model model = new Model(list);
-        TableCamembert tc = new TableCamembert(model);
+
         IModel adapter = new Adapter(model);
         IControlleur ctr = new Controlleur();
         Vue vue = new Vue(adapter, ctr);
+        TableCamembert tc = new TableCamembert(model, ctr);
         ctr.setVue(vue);
 
 
+        Border eBorder = BorderFactory.createEtchedBorder();
 
 
         JFrame jf = new JFrame();
         JButton button = new JButton();
+        JButton button2 = new JButton("Remove");
         JTable tableau = new JTable(tc);
-        JPanel camPart = new JPanel();
         JPanel tabPart = new JPanel();
-        camPart.add(vue);
 
 
-        jf.add(camPart);
         jf.setTitle(titreAppli);
         jf.getContentPane().add(vue);
-        button.setText("Add");
 
         tabPart.add(new JScrollPane(tableau));
         tabPart.add(button, BorderLayout.SOUTH);
+        tabPart.add(button2, BorderLayout.SOUTH);
         jf.add((tabPart), BorderLayout.EAST);
-        jf.setSize(new Dimension(1200, 900));
-
+        jf.setSize(new Dimension(1200, 500));
 
 
         // Bouton pour ajout d'une donnée
-        /** JButton addData = new JButton();
-         addData.setText("Add");
-         addData.setPreferredSize(new Dimension(70,0));
-         jf.getContentPane().add(addData, BorderLayout.EAST);**/
+        button.setText("Add");
+        button.addActionListener(e -> {
+            Item i = new Item("New Titre", "New Description", 100);
+            model.addItem(i);
+            vue.init();
+            vue.initCamembert();
+            tc.fireTableRowsInserted(model.getItems().size() - 1, model.getItems().size() - 1);
+            vue.repaint();
 
+        });
+
+
+        button2.addActionListener(e -> {
+            int[] selected = (tableau.getSelectedRows());
+            for (int i = 0; i < selected.length; i++) {
+                ctr.removeItem(selected[0]);
+            }
+            tc.fireTableRowsInserted(model.getItems().size() - 1, model.getItems().size() - 1);
+            tableau.clearSelection();
+
+        });
 
         //Fermeture de l'application + fermeture programme
         jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -78,5 +88,7 @@ public class Main {
         jf.setResizable(false);
         jf.setVisible(true);
 
+
     }
+
 }
